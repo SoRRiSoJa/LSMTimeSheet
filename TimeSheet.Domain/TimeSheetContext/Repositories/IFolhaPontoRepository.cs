@@ -6,7 +6,7 @@ namespace TimeSheet.Domain.TimeSheetContext.Repositories
     public interface IFolhaPontoRepository
     {
         Task Novo(FolhaPonto folhaPOnto);
-        Task Alterar(Guid idFolhaPonto,FolhaPonto folhaPOnto);
+        Task Alterar(Guid idFolhaPonto, FolhaPonto folhaPOnto);
         Task<FolhaPonto> Obter(Guid idFolhaPonto);
         Task Excluir(Guid idFolhaPonto);
         void ListarPorFuncionario(Guid idFuncionario);

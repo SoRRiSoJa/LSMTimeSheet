@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dapper;
 
 namespace TimeSheet.Infra.TimeSheetContext.Repositories
 {
- 
+
     using TimeSheet.Domain.TimeSheetContext.Entities;
     using TimeSheet.Domain.TimeSheetContext.Queries;
     using TimeSheet.Domain.TimeSheetContext.Repositories;
@@ -14,7 +14,7 @@ namespace TimeSheet.Infra.TimeSheetContext.Repositories
     public class UsuarioRepository : IUsuarioRepository
     {
         private readonly DbSession _session;
-        
+
         public UsuarioRepository(DbSession _session)
         {
             this._session = _session ?? throw new ArgumentNullException(nameof(_session));
@@ -26,17 +26,15 @@ namespace TimeSheet.Infra.TimeSheetContext.Repositories
             {
                 string query = @"UPDATE Tb_Usuario SET Login = @Login, Senha = @Senha, DataAlteracao = @DataAlteracao,Ativo = @IsAtivo WHERE Id_Usuario=@Id";
                 var antigo = Obter(id);
-            
-                if(antigo is not null)
+
+                if (antigo is not null)
                     await _session.Connection.ExecuteAsync(query, new { usuario.Login, usuario.Senha, usuario.DataAlteracao, usuario.IsAtivo, usuario.Id }, _session.Transaction);
-            
+
             }
             catch (Exception)
             {
                 throw new NotImplementedException();
             }
-            
-            
         }
 
         public async Task<bool> ConsultarLoginExistente(string login)
@@ -52,7 +50,6 @@ namespace TimeSheet.Infra.TimeSheetContext.Repositories
             {
                 throw;
             }
-           
         }
 
         public async Task Excluir(Guid id)
@@ -65,21 +62,27 @@ namespace TimeSheet.Infra.TimeSheetContext.Repositories
                     usuario.IsAtivo = false;
                     await Atualizar(id, usuario);
                 }
-
             }
             catch (Exception)
             {
                 throw new NotImplementedException();
             }
-           
+
         }
 
         public async Task<IEnumerable<ListarUsuarioQueryResult>> Listar()
         {
-            var query = "SELECT Id_Usuario, Login, Senha FROM Tb_Usuario WHERE  Id_Usuario=@id AND Ativo=1";
-            var result = await _session.Connection.QueryAsync<ListarUsuarioQueryResult>(query, _session.Transaction);
-            _session.Dispose();
-            return result;
+            try
+            {
+                var query = "SELECT Id_Usuario, Login, Senha FROM Tb_Usuario WHERE  Id_Usuario=@id AND Ativo=1";
+                var result = await _session.Connection.QueryAsync<ListarUsuarioQueryResult>(query, _session.Transaction);
+                _session.Dispose();
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task Novo(Usuario usuario)
@@ -98,10 +101,17 @@ namespace TimeSheet.Infra.TimeSheetContext.Repositories
 
         public async Task<Usuario> Obter(Guid id)
         {
-            var query = "SELECT * FROM Tb_Usuario WHERE  Id_Usuario=@id AND Ativo=1";
-            var result = await _session.Connection.QueryFirstOrDefaultAsync<Usuario>(query, new { id }, _session.Transaction);
-            _session.Dispose();
-            return result;
+            try
+            {
+                var query = "SELECT * FROM Tb_Usuario WHERE  Id_Usuario=@id AND Ativo=1";
+                var result = await _session.Connection.QueryFirstOrDefaultAsync<Usuario>(query, new { id }, _session.Transaction);
+                _session.Dispose();
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

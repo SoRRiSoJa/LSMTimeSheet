@@ -18,7 +18,7 @@ namespace TimeSheet.Infra.TimeSheetContext.DataContext
                 Connection = new SqlConnection(_configuration.GetConnectionString("TimeSheet"));
                 Connection.Open();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new NotImplementedException();
             }

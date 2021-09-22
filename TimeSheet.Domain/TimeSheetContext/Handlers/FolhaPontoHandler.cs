@@ -1,6 +1,6 @@
 ﻿using FluentValidator;
-using System.Threading.Tasks;
 using System;
+using System.Threading.Tasks;
 namespace TimeSheet.Domain.TimeSheetContext.Handlers
 {
 
@@ -140,9 +140,9 @@ namespace TimeSheet.Domain.TimeSheetContext.Handlers
 
             return new ReprovarFolhaPontoCommandResult(true, "Atividade reprovada pelo responsável com sucesso", new
             {
-                IdTarefa=folhaPonto.Id,
-                NomeResponsavel=folhaPonto.Projeto.Responsavel.Nome.NomeCompleto,
-                NomeFuncionario=folhaPonto.Funcionario.Nome.NomeCompleto,
+                IdTarefa = folhaPonto.Id,
+                NomeResponsavel = folhaPonto.Projeto.Responsavel.Nome.NomeCompleto,
+                NomeFuncionario = folhaPonto.Funcionario.Nome.NomeCompleto,
             });
         }
         #endregion
