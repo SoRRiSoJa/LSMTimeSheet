@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System;
 namespace TimeSheet.Domain.TimeSheetContext.Handlers
 {
-    
+
     using TimeSheet.Domain.TimeSheetContext.Commands.FolhaPontoCommands.Inputs;
     using TimeSheet.Domain.TimeSheetContext.Commands.FolhaPontoCommands.Outputs;
     using TimeSheet.Domain.TimeSheetContext.Entities;
@@ -24,6 +24,7 @@ namespace TimeSheet.Domain.TimeSheetContext.Handlers
             this._projetoRepository = _projetoRepository ?? throw new ArgumentNullException(nameof(_projetoRepository));
         }
 
+        #region CriarFolhaPontoHandler
         public async Task<ICommandResult> Handle(CriarFolhaPontoCommand command)
         {
             //TODO: Recuperar e validar funcionario
@@ -66,9 +67,11 @@ namespace TimeSheet.Domain.TimeSheetContext.Handlers
                 funcionario.Nome.NomeCompleto,
             });
         }
-        public async Task<ICommandResult> Handle(AprovarFolhaPontoCommand command) 
+        #endregion
+        #region AprovarFolhaPontoHandler
+        public async Task<ICommandResult> Handle(AprovarFolhaPontoCommand command)
         {
-           
+
             var responsavel = await _funcionarioRepository.Obter(command.Responsavel);
             if (responsavel is null)
                 AddNotification("responsavel", "Este funcionario não esta cadastrado.");
@@ -76,15 +79,38 @@ namespace TimeSheet.Domain.TimeSheetContext.Handlers
             var projeto = await _projetoRepository.Obter(command.Projeto);
             if (projeto is null)
                 AddNotification("Projeto", "Este projeto não esta cadastrado.");
+            if (await _projetoRepository.EResponsavelPeloProjeto(command.Projeto, command.Responsavel))
+                AddNotification("Responsavel", "Você não é responsável pelo projeto, não pode reprovar..");
 
-            return new AprovarFolhaPontoCommandResult(true, "Atividade aprovada pelo responsável com sucesso", new
+            var folhaPonto = await _repository.Obter(command.FolhaPonto);
+            if (folhaPonto is null)
+                AddNotification("FolhaPonto", "Você deve informar uma terfa a ser reprovada.");
+
+            folhaPonto.AprovarTarefa();
+
+            AddNotifications(folhaPonto.Notifications);
+
+
+            if (Invalid)
+                return new AprovarFolhaPontoCommandResult(
+                    false,
+                    "Por favor, corrija os campos abaixo",
+                    Notifications);
+
+            await _repository.Alterar(command.FolhaPonto, folhaPonto);
+
+            return new AprovarFolhaPontoCommandResult(true, "Atividade reprovada pelo responsável com sucesso", new
             {
-                command.FolhaPonto,
+                IdTarefa = folhaPonto.Id,
+                NomeResponsavel = folhaPonto.Projeto.Responsavel.Nome.NomeCompleto,
+                NomeFuncionario = folhaPonto.Funcionario.Nome.NomeCompleto,
             });
         }
+        #endregion
+        #region ReprovarFolhaPontoHandler
         public async Task<ICommandResult> Handle(ReprovarFolhaPontoCommand command)
         {
-           
+
             var responsavel = await _funcionarioRepository.Obter(command.Responsavel);
             if (responsavel is null)
                 AddNotification("responsavel", "Este funcionario não esta cadastrado.");
@@ -92,10 +118,33 @@ namespace TimeSheet.Domain.TimeSheetContext.Handlers
             var projeto = await _projetoRepository.Obter(command.Projeto);
             if (projeto is null)
                 AddNotification("Projeto", "Este projeto não esta cadastrado.");
+            if (await _projetoRepository.EResponsavelPeloProjeto(command.Projeto, command.Responsavel))
+                AddNotification("Responsavel", "Você não é responsável pelo projeto, não pode reprovar..");
+
+            var folhaPonto = await _repository.Obter(command.FolhaPonto);
+            if (folhaPonto is null)
+                AddNotification("FolhaPonto", "Você deve informar uma terfa a ser reprovada.");
+
+            folhaPonto.ReprovarTarefa();
+
+            AddNotifications(folhaPonto.Notifications);
+
+
+            if (Invalid)
+                return new ReprovarFolhaPontoCommandResult(
+                    false,
+                    "Por favor, corrija os campos abaixo",
+                    Notifications);
+
+            await _repository.Alterar(command.FolhaPonto, folhaPonto);
+
             return new ReprovarFolhaPontoCommandResult(true, "Atividade reprovada pelo responsável com sucesso", new
             {
-                command.FolhaPonto,
+                IdTarefa=folhaPonto.Id,
+                NomeResponsavel=folhaPonto.Projeto.Responsavel.Nome.NomeCompleto,
+                NomeFuncionario=folhaPonto.Funcionario.Nome.NomeCompleto,
             });
         }
+        #endregion
     }
 }
