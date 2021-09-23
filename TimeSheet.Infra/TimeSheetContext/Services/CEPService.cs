@@ -7,7 +7,7 @@ namespace TimeSheet.Infra.TimeSheetContext.Services
     using TimeSheet.Domain.TimeSheetContext.ValueObjects;
     using TimeSheet.Infra.TimeSheetContext.Abstractions;
 
-    public class CEPService : ICEP
+    public class CEPService : ICEPService
     {
         public async Task<Endereco> Obter(string cep)
         {

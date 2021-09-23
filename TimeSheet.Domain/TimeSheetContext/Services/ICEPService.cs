@@ -3,7 +3,7 @@ using TimeSheet.Domain.TimeSheetContext.ValueObjects;
 
 namespace TimeSheet.Domain.TimeSheetContext.Services
 {
-    public interface ICEP
+    public interface ICEPService
     {
         Task<Endereco> Obter(string cep);
     }

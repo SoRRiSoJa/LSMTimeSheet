@@ -16,8 +16,8 @@ namespace TimeSheet.Domain.TimeSheetContext.Handlers
     {
         private readonly IFuncionarioRepository _repository;
         private readonly IUsuarioRepository _usuarioRepository;
-        private readonly ICEP _cepService;
-        public FuncionarioHandler(IFuncionarioRepository _repository, IUsuarioRepository _usuarioRepository, ICEP _cepService)
+        private readonly ICEPService _cepService;
+        public FuncionarioHandler(IFuncionarioRepository _repository, IUsuarioRepository _usuarioRepository, ICEPService _cepService)
         {
             this._repository = _repository ?? throw new ArgumentNullException(nameof(_repository));
             this._usuarioRepository = _usuarioRepository ?? throw new ArgumentNullException(nameof(_usuarioRepository));
